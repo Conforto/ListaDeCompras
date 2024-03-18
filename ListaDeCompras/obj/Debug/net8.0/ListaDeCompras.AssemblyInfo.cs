@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ListaDeCompras")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2fcf08f90d37e2fe1d058989af1f6a963ea7c1b3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c8172be2d8915ed96ba9631c213ecac3d0f8f86")]
 [assembly: System.Reflection.AssemblyProductAttribute("ListaDeCompras")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ListaDeCompras")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
