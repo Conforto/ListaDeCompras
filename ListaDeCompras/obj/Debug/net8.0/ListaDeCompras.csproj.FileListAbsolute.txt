@@ -55,3 +55,4 @@ C:\Users\lconforto\source\repos\ListaDeCompras\ListaDeCompras\obj\Debug\net8.0\L
 C:\Users\lconforto\source\repos\ListaDeCompras\ListaDeCompras\obj\Debug\net8.0\ListaDeC.5051732C.Up2Date
 C:\Users\lconforto\source\repos\ListaDeCompras\ListaDeCompras\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\lconforto\source\repos\ListaDeCompras\ListaDeCompras\bin\Debug\net8.0\MySqlConnector.dll
+C:\Users\lconforto\source\repos\ListaDeCompras\ListaDeCompras\bin\Debug\net8.0\BCrypt.Net-Next.dll

@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "okwGXGRO9wtuYFOAxdTMPqMdbyconvbUlhIhZaZd5MwnDh64+B6COxiMadAYHKqKE4a6Wk1w0CTUErJzKOwgyQ==",
+  "dgSpecHash": "nymy6vY4O16oiF+yFIdrWRvFVWi9/73N/LKVOzUyCMDdWpWW0PL8vqTJ9XtDTVDR7aE4BBgzxVwvCw6RAX8FsA==",
   "success": true,
   "projectFilePath": "C:\\Users\\lconforto\\source\\repos\\ListaDeCompras\\ListaDeCompras\\ListaDeCompras.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\lconforto\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\lconforto\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
+    "C:\\Users\\lconforto\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\lconforto\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\1.1.1\\microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
     "C:\\Users\\lconforto\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\lconforto\\.nuget\\packages\\microsoft.data.sqlclient\\5.2.0\\microsoft.data.sqlclient.5.2.0.nupkg.sha512",

@@ -1,6 +1,9 @@
 ﻿using System;
 using Microsoft.Data.SqlClient;
 using MySqlConnector;
+using BCrypt.Net;
+
+
 
 namespace ListaDeCompras
 {
@@ -9,9 +12,31 @@ namespace ListaDeCompras
         //Aplicação
         static void Main(string[] args)
         {
-            Console.Write("Por favor, digite a senha do banco de dados: ");
-            string dbPassword = Console.ReadLine();
-            string connectionString = $"Server=127.0.0.1; Database=listadecompras; User Id=root; Password={dbPassword};";
+            string connectionString = $"Server=127.0.0.1; Database=listadecompras; User Id=root; Password=;";
+            Console.WriteLine("1. Login\n2. Registrar novo usuário");
+            Console.Write("Escolha uma opção: ");
+            var escolha = Console.ReadLine();
+
+            switch (escolha)
+            {
+                case "1":
+                    Login(connectionString);
+                    break;
+                case "2":
+                    RegistrarNovoUsuario(connectionString);
+                    break;
+                default:
+                    Console.WriteLine("Opção inválida.");
+                    break;
+
+            }
+        }
+
+        //Métodos
+
+        //Método do Menu Inicial
+        static void AbreMenu(string connectionString)
+        {
             Console.WriteLine("O que você gostaria de fazer?");
             Console.WriteLine("1. Trabalhar com produtos\n2. Trabalhar com listas de compras");
             Console.Write("Escolha uma opção: ");
@@ -32,11 +57,76 @@ namespace ListaDeCompras
                     break;
             }
         }
+        //Método de Login
+        static void Login(string connectionString)
+        {
+            Console.Write("Username: ");
+            string username = Console.ReadLine();
+            Console.Write("Senha: ");
+            string senha = LerSenhaOcultando();
 
-        //Métodos
+            try
+            {
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    var sql = "SELECT Senha FROM Usuarios WHERE Username = @Username";
+                    using (var command = new MySqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Username", username);
+                        var hashSenha = command.ExecuteScalar()?.ToString();
 
+                        if (hashSenha != null && BCrypt.Net.BCrypt.Verify(senha, hashSenha))
+                        {
+                            Console.WriteLine("Login bem-sucedido!");
+                            AbreMenu(connectionString);
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Login falhou. Username ou senha incorretos.");
+                            Login(connectionString);
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+        }
         //Método para trabalhar com os produtos
-        static void GerenciarProdutos(string connectionString) 
+        static void RegistrarNovoUsuario(string connectionString)
+        {
+            Console.Write("Escolha um username: ");
+            string username = Console.ReadLine();
+            Console.Write("Escolha uma senha: ");
+            string senha = LerSenhaOcultando();
+
+            var senhaHash = BCrypt.Net.BCrypt.HashPassword(senha);
+
+            try
+            {
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    var sql = "INSERT INTO Usuarios (Username, Senha) VALUES (@Username, @Senha)";
+                    using (var command = new MySqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Username", username);
+                        command.Parameters.AddWithValue("@Senha", senhaHash);
+                        command.ExecuteNonQuery();
+                        Console.WriteLine("Usuário registrado com sucesso!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+        }
+        static void GerenciarProdutos(string connectionString)
         {
             // Aqui você pode adicionar uma lógica para escolher entre criar um novo produto ou atualizar um existente
             Console.WriteLine("O que você gostaria de fazer?");
@@ -60,7 +150,7 @@ namespace ListaDeCompras
             }
         }
         //Método para trabalhar com as listas
-        static void GerenciarListasDeCompras(string connectionString) 
+        static void GerenciarListasDeCompras(string connectionString)
         {
             Console.WriteLine("O que você gostaria de fazer?");
             Console.WriteLine("1. Criar nova lista de compras\n2. Atualizar lista de compras existente");
@@ -336,8 +426,34 @@ namespace ListaDeCompras
                 Console.WriteLine($"Ocorreu um erro: {ex.Message}");
             }
         }
-        //Método para criar Lista de Compras
-
+        //Método para cobrir a senha digitada
+        static string LerSenhaOcultando()
+        {
+            string senha = "";
+            ConsoleKeyInfo info = Console.ReadKey(true);
+            while (info.Key != ConsoleKey.Enter)
+            {
+                if (info.Key != ConsoleKey.Backspace)
+                {
+                    Console.Write("*");
+                    senha += info.KeyChar;
+                }
+                else if (info.Key == ConsoleKey.Backspace)
+                {
+                    if (!string.IsNullOrEmpty(senha))
+                    {
+                        // Remove o último caractere da senha se o usuário pressionar Backspace
+                        senha = senha.Substring(0, senha.Length - 1);
+                        // Remover o último asterisco da tela
+                        Console.Write("\b \b");
+                    }
+                }
+                info = Console.ReadKey(true);
+            }
+            // Uma nova linha para a saída após pressionar Enter
+            Console.WriteLine();
+            return senha;
+        }
 
         //Classes
         public class Produto
