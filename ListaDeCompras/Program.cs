@@ -9,29 +9,46 @@ namespace ListaDeCompras
 {
     class Program
     {
-        //Aplicação
-        static void Main(string[] args)
+        //Classes
+        public class Produto
         {
-            string connectionString = $"Server=127.0.0.1; Database=listadecompras; User Id=root; Password=;";
-            Console.WriteLine("1. Login\n2. Registrar novo usuário");
-            Console.Write("Escolha uma opção: ");
-            var escolha = Console.ReadLine();
+            public float Valor { get; set; }
+            public string Nome { get; set; }
+            public string Marca { get; set; }
 
-            switch (escolha)
+            public Produto(float valor, string nome, string marca)
             {
-                case "1":
-                    Login(connectionString);
-                    break;
-                case "2":
-                    RegistrarNovoUsuario(connectionString);
-                    break;
-                default:
-                    Console.WriteLine("Opção inválida.");
-                    break;
-
+                Valor = valor;
+                Nome = nome;
+                Marca = marca;
             }
-        }
 
+        }
+        public class ListaDeCompras
+        {
+            public int Id { get; set; }
+            public string Nome { get; set; }
+            public DateTime DataCriacao { get; set; }
+            public List<ItemListaDeCompras> Itens { get; set; }
+
+            public ListaDeCompras()
+            {
+                Itens = new List<ItemListaDeCompras>();
+            }
+
+            // Métodos adicionais conforme necessário
+        }
+        public class ItemListaDeCompras
+        {
+            public int ListaId { get; set; }
+            public ListaDeCompras Lista { get; set; } // Referência à lista de compras
+            public int ProdutoId { get; set; }
+            public Produto Produto { get; set; } // Referência ao produto
+            public int Quantidade { get; set; }
+            public float ValorTotal { get; set; }
+
+            // Métodos adicionais conforme necessário
+        }
         //Métodos
 
         //Método do Menu Inicial
@@ -236,42 +253,66 @@ namespace ListaDeCompras
             }
         }
         //Atualizar informações da lista
-        static void AtualizarLista(string connectionString)
+        static void AtualizarLista(string connectionString) 
         {
-            ListarListas(connectionString);
-            Console.Write("Digite o ID da lista que você deseja atualizar: ");
-            int id;
-            while (!int.TryParse(Console.ReadLine(), out id))
+            Console.WriteLine("O que você gostaria de fazer?");
+            Console.WriteLine("1. Adicionar Produtos a Lista\n2. Alterar nome da lista");
+            Console.Write("Escolha uma opção: ");
+            string escolha = Console.ReadLine();
+
+            switch (escolha)
             {
-                Console.Write("ID inválido. Por favor, digite um número de ID válido: ");
+                case "1":
+                    // Lógica para trabalhar com produtos
+                    AdicionarItemALista(connectionString);
+                    break;
+                case "2":
+                    // Lógica para trabalhar com listas de compras
+                    MudarNomeLista(connectionString);
+                    break;
+                default:
+                    Console.WriteLine("Opção inválida.");
+                    break;
             }
-
-            Console.Write("Digite o novo nome da lista: ");
-            string novoNome = Console.ReadLine();
-
-            try
+        }
+        static void MudarNomeLista(string connectionString) 
+        {
             {
-                using (var connection = new MySqlConnection(connectionString))
+                ListarListas(connectionString);
+                Console.Write("Digite o ID da lista que você deseja atualizar: ");
+                int id;
+                while (!int.TryParse(Console.ReadLine(), out id))
                 {
-                    connection.Open();
-                    var sql = "UPDATE Listas SET Nome = @Nome WHERE Id = @Id";
+                    Console.Write("ID inválido. Por favor, digite um número de ID válido: ");
+                }
 
-                    using (var command = new MySqlCommand(sql, connection))
+                Console.Write("Digite o novo nome da lista: ");
+                string novoNome = Console.ReadLine();
+
+                try
+                {
+                    using (var connection = new MySqlConnection(connectionString))
                     {
-                        command.Parameters.AddWithValue("@Nome", novoNome);
-                        command.Parameters.AddWithValue("@Id", id);
-                        int result = command.ExecuteNonQuery();
+                        connection.Open();
+                        var sql = "UPDATE Listas SET Nome = @Nome WHERE Id = @Id";
 
-                        if (result > 0)
-                            Console.WriteLine("Lista atualizada com sucesso!");
-                        else
-                            Console.WriteLine("Lista não encontrada.");
+                        using (var command = new MySqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@Nome", novoNome);
+                            command.Parameters.AddWithValue("@Id", id);
+                            int result = command.ExecuteNonQuery();
+
+                            if (result > 0)
+                                Console.WriteLine("Lista atualizada com sucesso!");
+                            else
+                                Console.WriteLine("Lista não encontrada.");
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ocorreu um erro ao atualizar a lista: {ex.Message}");
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ocorreu um erro ao atualizar a lista: {ex.Message}");
+                }
             }
         }
         //Método para criar o usuário criar um produto
@@ -454,47 +495,147 @@ namespace ListaDeCompras
             Console.WriteLine();
             return senha;
         }
-
-        //Classes
-        public class Produto
+        //Método para selecionar a lista de compras
+        static int SelecionarListaDeCompras(string connectionString)
         {
-            public float Valor { get; set; }
-            public string Nome { get; set; }
-            public string Marca { get; set; }
-
-            public Produto(float valor, string nome, string marca)
+            ListarListas(connectionString);
+            Console.Write("Digite o ID da lista de compras que você deseja adicionar itens: ");
+            if (int.TryParse(Console.ReadLine(), out int listaId))
             {
-                Valor = valor;
-                Nome = nome;
-                Marca = marca;
+                return listaId;
             }
-
-        }
-        public class ListaDeCompras
-        {
-            public int Id { get; set; }
-            public string Nome { get; set; }
-            public DateTime DataCriacao { get; set; }
-            public List<ItemListaDeCompras> Itens { get; set; }
-
-            public ListaDeCompras()
+            else
             {
-                Itens = new List<ItemListaDeCompras>();
+                Console.WriteLine("ID inválido.");
+                return -1; // Indica falha na seleção
             }
-
-            // Métodos adicionais conforme necessário
         }
-        public class ItemListaDeCompras
+        //Método para selecionar o produto para a lista de compras
+        static (int produtoId, float valor) SelecionarProduto(string connectionString)
         {
-            public int ListaId { get; set; }
-            public ListaDeCompras Lista { get; set; } // Referência à lista de compras
-            public int ProdutoId { get; set; }
-            public Produto Produto { get; set; } // Referência ao produto
-            public int Quantidade { get; set; }
-            public float ValorTotal { get; set; }
-
-            // Métodos adicionais conforme necessário
+            ListarProdutos(connectionString);
+            Console.Write("Digite o ID do produto que você deseja adicionar à lista: ");
+            if (int.TryParse(Console.ReadLine(), out int produtoId))
+            {
+                // Busca o valor do produto
+                try
+                {
+                    using (var connection = new MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        var sql = "SELECT Valor FROM Produtos WHERE Id = @ProdutoId";
+                        using (var command = new MySqlCommand(sql, connection))
+                        {
+                            command.Parameters.AddWithValue("@ProdutoId", produtoId);
+                            var resultado = command.ExecuteScalar();
+                            if (resultado != null)
+                            {
+                                float valor = Convert.ToSingle(resultado);
+                                return (produtoId, valor);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Produto não encontrado.");
+                                return (-1, 0); // Indica falha na busca
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao buscar o valor do produto: {ex.Message}");
+                    return (-1, 0); // Indica falha na busca
+                }
+            }
+            else
+            {
+                Console.WriteLine("ID inválido.");
+                return (-1, 0); // Indica falha na entrada
+            }
         }
+        //Método para adicionar quantidade desejada para o produto
+        static int ObterQuantidadeProduto()
+        {
+            Console.Write("Digite a quantidade do produto: ");
+            if (int.TryParse(Console.ReadLine(), out int quantidade))
+            {
+                return quantidade;
+            }
+            else
+            {
+                Console.WriteLine("Quantidade inválida.");
+                return -1; // Indica falha na entrada
+            }
+        }
+        //Método para adicionar os itens para o banco
+        static void AdicionarProdutoALista(string connectionString, int listaId, int produtoId, int quantidade, float valor)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    var sql = "INSERT INTO ListaProdutos (ListaId, ProdutoId, Quantidade,Valor_Total) VALUES (@ListaId, @ProdutoId, @Quantidade,@Valor_Total)";
+
+                    using (var command = new MySqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@ListaId", listaId);
+                        command.Parameters.AddWithValue("@ProdutoId", produtoId);
+                        command.Parameters.AddWithValue("@Quantidade", quantidade);
+                        command.Parameters.AddWithValue("@Valor_Total", valor*quantidade);
+                        command.ExecuteNonQuery();
+                        Console.WriteLine("Produto adicionado à lista com sucesso!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao adicionar produto à lista: {ex.Message}");
+            }
+        }
+        //Método para utilizar os métodos em conjunto referentes aos itens da lista de compras
+        static void AdicionarItemALista(string connectionString)
+        {
+            int listaId = SelecionarListaDeCompras(connectionString);
+            if (listaId == -1) return; // Falha na seleção da lista
+
+            var (produtoId, valor) = SelecionarProduto(connectionString);
+            if (produtoId == -1) return; // Falha na seleção do produto
+
+            int quantidade = ObterQuantidadeProduto();
+            if (quantidade == -1) return; // Falha na especificação da quantidade
+
+            AdicionarProdutoALista(connectionString, listaId, produtoId, quantidade, valor);
+        }
+
+
+
+
+
+
+        //Aplicação
+        static void Main(string[] args)
+        {
+            string connectionString = $"Server=127.0.0.1; Database=listadecompras; User Id=root; Password=;";
+            Console.WriteLine("1. Login\n2. Registrar novo usuário");
+            Console.Write("Escolha uma opção: ");
+            var escolha = Console.ReadLine();
+
+            switch (escolha)
+            {
+                case "1":
+                    Login(connectionString);
+                    break;
+                case "2":
+                    RegistrarNovoUsuario(connectionString);
+                    break;
+                default:
+                    Console.WriteLine("Opção inválida.");
+                    break;
+
+            }
+        }
+
 
     }
 }
